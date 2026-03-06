@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+
 # “””
-Protégé-like Ontology Editor — Streamlit App
+Protege-like Ontology Editor - Streamlit App
 
 Install dependencies:
 pip install streamlit rdflib networkx pyvis
