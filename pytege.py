@@ -366,7 +366,7 @@ with st.sidebar:
 
     # Import
     st.markdown("###  Import")
-    uploaded = st.file_uploader("Load OWL / RDF / JSON", type=["owl", "ttl", "xml", "n3", "json", "jsonld"])
+    uploaded = st.file_uploader("Load OWL / RDF / JSON (any format)", type=None)
     if uploaded:
         file_key = f"{uploaded.name}_{uploaded.size}"
         if st.session_state.get("last_imported") != file_key:
@@ -384,10 +384,21 @@ with st.sidebar:
                     except Exception as e:
                         st.error(f"JSON parse error: {e}")
                 else:
+                    # Detect format from extension first, then sniff content
                     fmt_guess = "xml"
                     if name.endswith(".ttl"): fmt_guess = "turtle"
                     elif name.endswith(".n3"): fmt_guess = "n3"
                     elif name.endswith(".jsonld"): fmt_guess = "json-ld"
+                    elif name.endswith(".owl") or name.endswith(".xml"): fmt_guess = "xml"
+                    else:
+                        # Sniff content if extension is unknown
+                        snippet = raw[:200].decode("utf-8", errors="ignore").strip()
+                        if snippet.startswith("@") or snippet.startswith("PREFIX") or snippet.startswith("prefix"):
+                            fmt_guess = "turtle"
+                        elif snippet.startswith("{"):
+                            fmt_guess = "json-ld"
+                        else:
+                            fmt_guess = "xml"
                     try:
                         with st.spinner(f"Parsing {uploaded.name} - please wait..."):
                             import_rdf(raw, fmt_guess)
