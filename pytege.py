@@ -470,9 +470,12 @@ with tab_classes:
         for name in sorted(ont["classes"]):
             info = ont["classes"][name]
             with st.expander(f" {name}  <-  {info.get('parent','owl:Thing')}"):
+                _cls_names = all_class_names()
+                _cls_parent = info.get("parent", "owl:Thing")
+                if _cls_parent not in _cls_names: _cls_parent = "owl:Thing"
                 new_parent = st.selectbox(
-                    "Parent", all_class_names(),
-                    index=all_class_names().index(info.get("parent", "owl:Thing")),
+                    "Parent", _cls_names,
+                    index=_cls_names.index(_cls_parent),
                     key=f"cls_parent_{name}",
                 )
                 new_comment = st.text_area("Comment", value=info.get("comment", ""), key=f"cls_comment_{name}", height=60)
@@ -587,7 +590,7 @@ with tab_data:
             info = ont["data_properties"][name]
             with st.expander(f" {name}"):
                 d = st.selectbox("Domain", class_options, index=class_options.index(info.get("domain","-")) if info.get("domain","-") in class_options else 0, key=f"dp_d_{name}")
-                r = st.selectbox("XSD Range", XSD_TYPES, index=XSD_TYPES.index(info.get("range_xsd","string")), key=f"dp_r_{name}")
+                r = st.selectbox("XSD Range", XSD_TYPES, index=XSD_TYPES.index(info.get("range_xsd","string")) if info.get("range_xsd","string") in XSD_TYPES else 0, key=f"dp_r_{name}")
                 cm = st.text_area("Comment", value=info.get("comment",""), key=f"dp_cm_{name}", height=55)
                 c1, c2 = st.columns(2)
                 if c1.button(" Save", key=f"dp_sv_{name}"):
