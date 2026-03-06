@@ -18,24 +18,24 @@ from rdflib import Graph, Namespace, URIRef, Literal, OWL, RDF, RDFS, XSD
 from rdflib.namespace import DC
 import networkx as nx
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 # Page config
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 st.set_page_config(
-page_title=“Protégé Lite — Ontology Editor”,
-page_icon=“🦉”,
+page_title=“Protege Lite - Ontology Editor”,
+page_icon=””,
 layout=“wide”,
 initial_sidebar_state=“expanded”,
 )
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 # Custom CSS
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 st.markdown(”””
 
@@ -94,11 +94,11 @@ st.markdown(”””
 
 “””, unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 # Session-state initialisation
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 def init_state():
 if “ontology” not in st.session_state:
@@ -115,11 +115,11 @@ st.session_state.ontology = {
 init_state()
 ont = st.session_state.ontology
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 # Helper utilities
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 def all_class_names():
 base = [“owl:Thing”] + sorted(ont[“classes”].keys())
@@ -139,7 +139,7 @@ return tree
 
 def render_tree_node(name, tree, depth=0):
 children = tree.get(name, [])
-icon = “🔵” if name == “owl:Thing” else “📘”
+icon = “” if name == “owl:Thing” else “”
 indent = “ ” * (depth * 4)
 st.markdown(
 f”{indent}{icon} <span class='class-item'>{name}</span>”,
@@ -148,11 +148,11 @@ unsafe_allow_html=True,
 for child in sorted(children):
 render_tree_node(child, tree, depth + 1)
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 # RDF/OWL export
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 def build_rdf_graph() -> Graph:
 g = Graph()
@@ -187,9 +187,9 @@ for name, info in ont["classes"].items():
 for name, info in ont["object_properties"].items():
     prop = NS[name]
     g.add((prop, RDF.type, OWL.ObjectProperty))
-    if info.get("domain") and info["domain"] != "—":
+    if info.get("domain") and info["domain"] != "-":
         g.add((prop, RDFS.domain, NS[info["domain"]]))
-    if info.get("range") and info["range"] != "—":
+    if info.get("range") and info["range"] != "-":
         g.add((prop, RDFS.range, NS[info["range"]]))
     for char in info.get("characteristics", []):
         char_map = {
@@ -214,7 +214,7 @@ xsd_map = {
 for name, info in ont["data_properties"].items():
     prop = NS[name]
     g.add((prop, RDF.type, OWL.DatatypeProperty))
-    if info.get("domain") and info["domain"] != "—":
+    if info.get("domain") and info["domain"] != "-":
         g.add((prop, RDFS.domain, NS[info["domain"]]))
     rng = info.get("range_xsd", "string")
     g.add((prop, RDFS.range, xsd_map.get(rng, XSD.string)))
@@ -226,7 +226,7 @@ for name, info in ont["individuals"].items():
     ind = NS[name]
     g.add((ind, RDF.type, OWL.NamedIndividual))
     cls = info.get("class")
-    if cls and cls != "—":
+    if cls and cls != "-":
         g.add((ind, RDF.type, NS[cls]))
     for prop_name, value in info.get("obj_props", {}).items():
         g.add((ind, NS[prop_name], NS[value]))
@@ -238,11 +238,11 @@ for name, info in ont["individuals"].items():
 return g
 ```
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 # Import OWL/RDF
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 def import_rdf(content: bytes, fmt: str):
 g = Graph()
@@ -322,33 +322,33 @@ st.session_state.ontology = new_ont
 st.rerun()
 ```
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 # HEADER
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 st.markdown(”””
 
 <div class='main-header'>
-  <h2 style='margin:0'>🦉 Protégé Lite — Ontology Editor</h2>
+  <h2 style='margin:0'> Protege Lite - Ontology Editor</h2>
   <p style='margin:0;opacity:0.8;font-size:0.9rem'>
-    Build OWL ontologies with classes, properties, and individuals — export to RDF/OWL
+    Build OWL ontologies with classes, properties, and individuals - export to RDF/OWL
   </p>
 </div>
 """, unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────
+# ———————————————
 
-# SIDEBAR — Ontology metadata + import/export
+# SIDEBAR - Ontology metadata + import/export
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 with st.sidebar:
-st.header(“📁 Ontology”)
+st.header(” Ontology”)
 
 ```
-with st.expander("⚙️ Metadata", expanded=True):
+with st.expander(" Metadata", expanded=True):
     ont["label"] = st.text_input("Label", value=ont["label"])
     ont["iri"] = st.text_input("IRI / Namespace", value=ont["iri"])
     ont["description"] = st.text_area("Description", value=ont["description"], height=80)
@@ -356,7 +356,7 @@ with st.expander("⚙️ Metadata", expanded=True):
 st.divider()
 
 # Stats
-st.markdown("### 📊 Statistics")
+st.markdown("###  Statistics")
 col1, col2 = st.columns(2)
 col1.metric("Classes", len(ont["classes"]))
 col2.metric("Obj Props", len(ont["object_properties"]))
@@ -366,13 +366,13 @@ col2.metric("Individuals", len(ont["individuals"]))
 st.divider()
 
 # Export
-st.markdown("### 💾 Export")
+st.markdown("###  Export")
 export_fmt = st.selectbox("Format", ["xml", "turtle", "n3", "json-ld"], key="export_fmt")
 g = build_rdf_graph()
 ext_map = {"xml": "owl", "turtle": "ttl", "n3": "n3", "json-ld": "jsonld"}
 rdf_bytes = g.serialize(format=export_fmt).encode()
 st.download_button(
-    label=f"⬇️ Download .{ext_map[export_fmt]}",
+    label=f" Download .{ext_map[export_fmt]}",
     data=rdf_bytes,
     file_name=f"{ont['label'].replace(' ','_')}.{ext_map[export_fmt]}",
     mime="text/plain",
@@ -380,7 +380,7 @@ st.download_button(
 
 # Export as JSON (project save)
 st.download_button(
-    label="💾 Save Project (.json)",
+    label=" Save Project (.json)",
     data=json.dumps(ont, indent=2),
     file_name="ontology_project.json",
     mime="application/json",
@@ -389,7 +389,7 @@ st.download_button(
 st.divider()
 
 # Import
-st.markdown("### 📂 Import")
+st.markdown("###  Import")
 uploaded = st.file_uploader("Load OWL / RDF / JSON", type=["owl", "ttl", "xml", "n3", "json", "jsonld"])
 if uploaded:
     raw = uploaded.read()
@@ -411,7 +411,7 @@ if uploaded:
         except Exception as e:
             st.error(f"Import error: {e}")
 
-if st.button("🗑️ Reset Ontology", type="secondary"):
+if st.button(" Reset Ontology", type="secondary"):
     st.session_state.ontology = {
         "iri": "http://example.org/myOntology#",
         "label": "My Ontology", "description": "",
@@ -421,26 +421,26 @@ if st.button("🗑️ Reset Ontology", type="secondary"):
     st.rerun()
 ```
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 # MAIN TABS
 
-# ─────────────────────────────────────────────
+# ———————————————
 
 tab_classes, tab_obj, tab_data, tab_ind, tab_graph, tab_sparql = st.tabs([
-“📘 Classes”,
-“🔗 Object Properties”,
-“📊 Data Properties”,
-“👤 Individuals”,
-“🕸️ Graph View”,
-“🔍 Query (SPARQL)”,
+“ Classes”,
+“ Object Properties”,
+“ Data Properties”,
+“ Individuals”,
+“ Graph View”,
+“ Query (SPARQL)”,
 ])
 
-# ═══════════════════════════════════════════════
+# ===============================================
 
-# TAB 1 — CLASSES
+# TAB 1 - CLASSES
 
-# ═══════════════════════════════════════════════
+# ===============================================
 
 with tab_classes:
 col_tree, col_editor = st.columns([1, 2])
@@ -457,7 +457,7 @@ with col_editor:
         cls_name = st.text_input("Class name *", placeholder="e.g. Person")
         cls_parent = st.selectbox("Subclass of", all_class_names())
         cls_comment = st.text_area("Comment / Description", height=70)
-        submitted = st.form_submit_button("➕ Add Class", type="primary")
+        submitted = st.form_submit_button("+ Add Class", type="primary")
         if submitted:
             if not cls_name.strip():
                 st.error("Class name is required.")
@@ -468,7 +468,7 @@ with col_editor:
                     "parent": cls_parent,
                     "comment": cls_comment,
                 }
-                st.success(f"✅ Class '{cls_name}' added.")
+                st.success(f" Class '{cls_name}' added.")
                 st.rerun()
 
     st.divider()
@@ -477,7 +477,7 @@ with col_editor:
         st.info("No classes defined yet.")
     for name in sorted(ont["classes"]):
         info = ont["classes"][name]
-        with st.expander(f"📘 {name}  ←  {info.get('parent','owl:Thing')}"):
+        with st.expander(f" {name}  <-  {info.get('parent','owl:Thing')}"):
             new_parent = st.selectbox(
                 "Parent", all_class_names(),
                 index=all_class_names().index(info.get("parent", "owl:Thing")),
@@ -485,21 +485,21 @@ with col_editor:
             )
             new_comment = st.text_area("Comment", value=info.get("comment", ""), key=f"cls_comment_{name}", height=60)
             c1, c2 = st.columns(2)
-            if c1.button("💾 Save", key=f"cls_save_{name}"):
+            if c1.button(" Save", key=f"cls_save_{name}"):
                 ont["classes"][name]["parent"] = new_parent
                 ont["classes"][name]["comment"] = new_comment
                 st.success("Saved.")
                 st.rerun()
-            if c2.button("🗑️ Delete", key=f"cls_del_{name}"):
+            if c2.button(" Delete", key=f"cls_del_{name}"):
                 del ont["classes"][name]
                 st.rerun()
 ```
 
-# ═══════════════════════════════════════════════
+# ===============================================
 
-# TAB 2 — OBJECT PROPERTIES
+# TAB 2 - OBJECT PROPERTIES
 
-# ═══════════════════════════════════════════════
+# ===============================================
 
 with tab_obj:
 col_list, col_edit = st.columns([1, 2])
@@ -512,14 +512,14 @@ with col_list:
     for name in sorted(ont["object_properties"]):
         info = ont["object_properties"][name]
         st.markdown(
-            f"<div class='property-item'>🔗 <b>{name}</b><br>"
-            f"<small>{info.get('domain','?')} → {info.get('range','?')}</small></div>",
+            f"<div class='property-item'> <b>{name}</b><br>"
+            f"<small>{info.get('domain','?')} -> {info.get('range','?')}</small></div>",
             unsafe_allow_html=True,
         )
 
 with col_edit:
     st.subheader("Add / Edit Object Property")
-    class_options = ["—"] + sorted(ont["classes"].keys())
+    class_options = ["-"] + sorted(ont["classes"].keys())
     CHARACTERISTICS = [
         "Functional", "InverseFunctional", "Transitive",
         "Symmetric", "Asymmetric", "Reflexive", "Irreflexive",
@@ -530,7 +530,7 @@ with col_edit:
         op_range = st.selectbox("Range", class_options)
         op_chars = st.multiselect("Characteristics", CHARACTERISTICS)
         op_comment = st.text_area("Comment", height=60)
-        if st.form_submit_button("➕ Add Property", type="primary"):
+        if st.form_submit_button("+ Add Property", type="primary"):
             if not op_name.strip():
                 st.error("Name required.")
             else:
@@ -538,35 +538,35 @@ with col_edit:
                     "domain": op_domain, "range": op_range,
                     "characteristics": op_chars, "comment": op_comment,
                 }
-                st.success(f"✅ '{op_name}' added.")
+                st.success(f" '{op_name}' added.")
                 st.rerun()
 
     st.divider()
     for name in sorted(ont["object_properties"]):
         info = ont["object_properties"][name]
-        with st.expander(f"🔗 {name}"):
-            d = st.selectbox("Domain", class_options, index=class_options.index(info.get("domain","—")) if info.get("domain","—") in class_options else 0, key=f"op_d_{name}")
-            r = st.selectbox("Range", class_options, index=class_options.index(info.get("range","—")) if info.get("range","—") in class_options else 0, key=f"op_r_{name}")
+        with st.expander(f" {name}"):
+            d = st.selectbox("Domain", class_options, index=class_options.index(info.get("domain","-")) if info.get("domain","-") in class_options else 0, key=f"op_d_{name}")
+            r = st.selectbox("Range", class_options, index=class_options.index(info.get("range","-")) if info.get("range","-") in class_options else 0, key=f"op_r_{name}")
             ch = st.multiselect("Characteristics", CHARACTERISTICS, default=info.get("characteristics",[]), key=f"op_ch_{name}")
             cm = st.text_area("Comment", value=info.get("comment",""), key=f"op_cm_{name}", height=55)
             c1, c2 = st.columns(2)
-            if c1.button("💾 Save", key=f"op_sv_{name}"):
+            if c1.button(" Save", key=f"op_sv_{name}"):
                 ont["object_properties"][name].update({"domain": d, "range": r, "characteristics": ch, "comment": cm})
                 st.success("Saved."); st.rerun()
-            if c2.button("🗑️ Delete", key=f"op_dl_{name}"):
+            if c2.button(" Delete", key=f"op_dl_{name}"):
                 del ont["object_properties"][name]; st.rerun()
 ```
 
-# ═══════════════════════════════════════════════
+# ===============================================
 
-# TAB 3 — DATA PROPERTIES
+# TAB 3 - DATA PROPERTIES
 
-# ═══════════════════════════════════════════════
+# ===============================================
 
 with tab_data:
 col_list, col_edit = st.columns([1, 2])
 XSD_TYPES = [“string”, “integer”, “float”, “boolean”, “date”, “dateTime”]
-class_options = [”—”] + sorted(ont[“classes”].keys())
+class_options = [”-”] + sorted(ont[“classes”].keys())
 
 ```
 with col_list:
@@ -576,8 +576,8 @@ with col_list:
     for name in sorted(ont["data_properties"]):
         info = ont["data_properties"][name]
         st.markdown(
-            f"<div class='property-item'>📊 <b>{name}</b><br>"
-            f"<small>{info.get('domain','?')} → xsd:{info.get('range_xsd','string')}</small></div>",
+            f"<div class='property-item'> <b>{name}</b><br>"
+            f"<small>{info.get('domain','?')} -> xsd:{info.get('range_xsd','string')}</small></div>",
             unsafe_allow_html=True,
         )
 
@@ -588,40 +588,40 @@ with col_edit:
         dp_domain = st.selectbox("Domain", class_options)
         dp_range = st.selectbox("XSD Range type", XSD_TYPES)
         dp_comment = st.text_area("Comment", height=60)
-        if st.form_submit_button("➕ Add Property", type="primary"):
+        if st.form_submit_button("+ Add Property", type="primary"):
             if not dp_name.strip():
                 st.error("Name required.")
             else:
                 ont["data_properties"][dp_name] = {
                     "domain": dp_domain, "range_xsd": dp_range, "comment": dp_comment,
                 }
-                st.success(f"✅ '{dp_name}' added.")
+                st.success(f" '{dp_name}' added.")
                 st.rerun()
 
     st.divider()
     for name in sorted(ont["data_properties"]):
         info = ont["data_properties"][name]
-        with st.expander(f"📊 {name}"):
-            d = st.selectbox("Domain", class_options, index=class_options.index(info.get("domain","—")) if info.get("domain","—") in class_options else 0, key=f"dp_d_{name}")
+        with st.expander(f" {name}"):
+            d = st.selectbox("Domain", class_options, index=class_options.index(info.get("domain","-")) if info.get("domain","-") in class_options else 0, key=f"dp_d_{name}")
             r = st.selectbox("XSD Range", XSD_TYPES, index=XSD_TYPES.index(info.get("range_xsd","string")), key=f"dp_r_{name}")
             cm = st.text_area("Comment", value=info.get("comment",""), key=f"dp_cm_{name}", height=55)
             c1, c2 = st.columns(2)
-            if c1.button("💾 Save", key=f"dp_sv_{name}"):
+            if c1.button(" Save", key=f"dp_sv_{name}"):
                 ont["data_properties"][name].update({"domain": d, "range_xsd": r, "comment": cm})
                 st.success("Saved."); st.rerun()
-            if c2.button("🗑️ Delete", key=f"dp_dl_{name}"):
+            if c2.button(" Delete", key=f"dp_dl_{name}"):
                 del ont["data_properties"][name]; st.rerun()
 ```
 
-# ═══════════════════════════════════════════════
+# ===============================================
 
-# TAB 4 — INDIVIDUALS
+# TAB 4 - INDIVIDUALS
 
-# ═══════════════════════════════════════════════
+# ===============================================
 
 with tab_ind:
 col_list, col_edit = st.columns([1, 2])
-class_opts = [”—”] + sorted(ont[“classes”].keys())
+class_opts = [”-”] + sorted(ont[“classes”].keys())
 
 ```
 with col_list:
@@ -631,8 +631,8 @@ with col_list:
     for name in sorted(ont["individuals"]):
         info = ont["individuals"][name]
         st.markdown(
-            f"<div class='individual-item'>👤 <b>{name}</b><br>"
-            f"<small>type: {info.get('class','—')}</small></div>",
+            f"<div class='individual-item'> <b>{name}</b><br>"
+            f"<small>type: {info.get('class','-')}</small></div>",
             unsafe_allow_html=True,
         )
 
@@ -642,7 +642,7 @@ with col_edit:
         ind_name = st.text_input("Individual name *", placeholder="e.g. john_doe")
         ind_class = st.selectbox("Instance of (class)", class_opts)
         ind_comment = st.text_area("Comment", height=55)
-        if st.form_submit_button("➕ Add Individual", type="primary"):
+        if st.form_submit_button("+ Add Individual", type="primary"):
             if not ind_name.strip():
                 st.error("Name required.")
             elif ind_name in ont["individuals"]:
@@ -651,27 +651,27 @@ with col_edit:
                 ont["individuals"][ind_name] = {
                     "class": ind_class, "obj_props": {}, "data_props": {}, "comment": ind_comment,
                 }
-                st.success(f"✅ '{ind_name}' added.")
+                st.success(f" '{ind_name}' added.")
                 st.rerun()
 
     st.divider()
     st.subheader("Manage Individuals")
     for name in sorted(ont["individuals"]):
         info = ont["individuals"][name]
-        with st.expander(f"👤 {name}  [{info.get('class','—')}]"):
-            new_cls = st.selectbox("Class", class_opts, index=class_opts.index(info.get("class","—")) if info.get("class","—") in class_opts else 0, key=f"ind_cls_{name}")
+        with st.expander(f" {name}  [{info.get('class','-')}]"):
+            new_cls = st.selectbox("Class", class_opts, index=class_opts.index(info.get("class","-")) if info.get("class","-") in class_opts else 0, key=f"ind_cls_{name}")
             cm = st.text_area("Comment", value=info.get("comment",""), key=f"ind_cm_{name}", height=55)
 
             # Object property assertions
             if ont["object_properties"]:
                 st.markdown("**Object Property Assertions**")
                 op_keys = sorted(ont["object_properties"].keys())
-                ind_opts = ["—"] + sorted(ont["individuals"].keys())
+                ind_opts = ["-"] + sorted(ont["individuals"].keys())
                 for prop in op_keys:
-                    current_val = info.get("obj_props", {}).get(prop, "—")
+                    current_val = info.get("obj_props", {}).get(prop, "-")
                     idx = ind_opts.index(current_val) if current_val in ind_opts else 0
                     chosen = st.selectbox(f"  {prop}", ind_opts, index=idx, key=f"ind_op_{name}_{prop}")
-                    if chosen != "—":
+                    if chosen != "-":
                         info.setdefault("obj_props", {})[prop] = chosen
                     elif prop in info.get("obj_props", {}):
                         del info["obj_props"][prop]
@@ -688,22 +688,22 @@ with col_edit:
                         del info["data_props"][prop]
 
             c1, c2 = st.columns(2)
-            if c1.button("💾 Save", key=f"ind_sv_{name}"):
+            if c1.button(" Save", key=f"ind_sv_{name}"):
                 ont["individuals"][name]["class"] = new_cls
                 ont["individuals"][name]["comment"] = cm
                 st.success("Saved."); st.rerun()
-            if c2.button("🗑️ Delete", key=f"ind_dl_{name}"):
+            if c2.button(" Delete", key=f"ind_dl_{name}"):
                 del ont["individuals"][name]; st.rerun()
 ```
 
-# ═══════════════════════════════════════════════
+# ===============================================
 
-# TAB 5 — GRAPH VIEW (networkx / pyvis)
+# TAB 5 - GRAPH VIEW (networkx / pyvis)
 
-# ═══════════════════════════════════════════════
+# ===============================================
 
 with tab_graph:
-st.subheader(“🕸️ Ontology Graph”)
+st.subheader(” Ontology Graph”)
 
 ```
 try:
@@ -726,7 +726,7 @@ try:
     for prop, info in ont["object_properties"].items():
         d = info.get("domain","")
         r = info.get("range","")
-        if d and d != "—" and r and r != "—":
+        if d and d != "-" and r and r != "-":
             if d in ont["classes"] and r in ont["classes"]:
                 net.add_edge(d, r, label=prop, color="#43a047", title=prop)
 
@@ -734,7 +734,7 @@ try:
     for name, info in ont["individuals"].items():
         net.add_node(name, label=name, color="#f57c00", size=12, shape="dot", title=f"Individual: {name}\nClass: {info.get('class','')}")
         cls = info.get("class","")
-        if cls and cls != "—" and cls in ont["classes"]:
+        if cls and cls != "-" and cls in ont["classes"]:
             net.add_edge(name, cls, color="#ff9800", title="instanceOf", dashes=True)
         for prop, val in info.get("obj_props",{}).items():
             if val in ont["individuals"]:
@@ -751,7 +751,7 @@ try:
 
 except ImportError:
     # Fallback: matplotlib-based graph
-    st.warning("pyvis not installed — showing simplified graph. Install with: `pip install pyvis`")
+    st.warning("pyvis not installed - showing simplified graph. Install with: `pip install pyvis`")
     try:
         import matplotlib.pyplot as plt
         import matplotlib.patches as mpatches
@@ -790,14 +790,14 @@ except ImportError:
         st.error(f"Graph error: {e}")
 ```
 
-# ═══════════════════════════════════════════════
+# ===============================================
 
-# TAB 6 — SPARQL
+# TAB 6 - SPARQL
 
-# ═══════════════════════════════════════════════
+# ===============================================
 
 with tab_sparql:
-st.subheader(“🔍 SPARQL Query”)
+st.subheader(” SPARQL Query”)
 st.caption(“Run SPARQL SELECT queries against your ontology.”)
 
 ```
@@ -824,7 +824,7 @@ query_presets = {
 preset = st.selectbox("Preset queries", list(query_presets.keys()))
 sparql_query = st.text_area("SPARQL Query", value=query_presets[preset], height=180)
 
-if st.button("▶️ Run Query", type="primary"):
+if st.button("> Run Query", type="primary"):
     try:
         g = build_rdf_graph()
         results = g.query(sparql_query)
@@ -834,14 +834,14 @@ if st.button("▶️ Run Query", type="primary"):
             cols = [str(v) for v in results.vars]
             df = pd.DataFrame([[str(cell) if cell else "" for cell in row] for row in rows], columns=cols)
             st.dataframe(df, use_container_width=True)
-            st.caption(f"✅ {len(df)} result(s).")
+            st.caption(f" {len(df)} result(s).")
         else:
             st.info("Query returned no results.")
     except Exception as e:
         st.error(f"Query error: {e}")
 
 st.divider()
-st.subheader("📄 Raw RDF Triples")
+st.subheader(" Raw RDF Triples")
 if st.button("Show all triples"):
     g = build_rdf_graph()
     import pandas as pd
