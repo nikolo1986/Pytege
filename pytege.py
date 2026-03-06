@@ -368,24 +368,35 @@ with st.sidebar:
     st.markdown("###  Import")
     uploaded = st.file_uploader("Load OWL / RDF / JSON", type=["owl", "ttl", "xml", "n3", "json", "jsonld"])
     if uploaded:
-        raw = uploaded.read()
-        name = uploaded.name.lower()
-        if name.endswith(".json") and not name.endswith(".jsonld"):
-            try:
-                loaded = json.loads(raw)
-                st.session_state.ontology = loaded
-                st.rerun()
-            except Exception as e:
-                st.error(f"JSON parse error: {e}")
+        file_key = f"{uploaded.name}_{uploaded.size}"
+        if st.session_state.get("last_imported") != file_key:
+            if st.button("Load File", type="primary"):
+                raw = uploaded.read()
+                name = uploaded.name.lower()
+                if name.endswith(".json") and not name.endswith(".jsonld"):
+                    try:
+                        with st.spinner("Loading project file..."):
+                            loaded = json.loads(raw)
+                        st.session_state.ontology = loaded
+                        st.session_state.last_imported = file_key
+                        st.success(f"Loaded: {uploaded.name}")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"JSON parse error: {e}")
+                else:
+                    fmt_guess = "xml"
+                    if name.endswith(".ttl"): fmt_guess = "turtle"
+                    elif name.endswith(".n3"): fmt_guess = "n3"
+                    elif name.endswith(".jsonld"): fmt_guess = "json-ld"
+                    try:
+                        with st.spinner(f"Parsing {uploaded.name} - please wait..."):
+                            import_rdf(raw, fmt_guess)
+                        st.session_state.last_imported = file_key
+                        st.success(f"Loaded: {uploaded.name}")
+                    except Exception as e:
+                        st.error(f"Import error: {e}")
         else:
-            fmt_guess = "xml"
-            if name.endswith(".ttl"): fmt_guess = "turtle"
-            elif name.endswith(".n3"): fmt_guess = "n3"
-            elif name.endswith(".jsonld"): fmt_guess = "json-ld"
-            try:
-                import_rdf(raw, fmt_guess)
-            except Exception as e:
-                st.error(f"Import error: {e}")
+            st.success(f"Loaded: {uploaded.name}")
 
     if st.button(" Reset Ontology", type="secondary"):
         st.session_state.ontology = {
